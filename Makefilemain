@@ -1,0 +1,42 @@
+# special variables
+CC     = g++ 
+OFLAGS  = -O3
+LFLAGS  = 
+LIBRARIES = -lm -lgsl -lgslcblas -framework vecLib -lgfortran 
+#LIBRARIES = -framework veclib -lm
+#LIBRARIES = -lfftw3 -lm
+#LIBRARIES = -lmpi -lscs_mp
+
+# other variables
+MAINFILE = main 
+ OTHERS   = calc_objective lapack_interface qobjects
+ OBJS = $(MAINFILE:%=%.o) $(OTHERS:%=%.o) 
+
+# pattern rules to define implicit rule
+%.o: %.cc
+	g++ -c $(OFLAGS) $< 
+        
+%.o: %.cpp
+	g++ -c $(OFLAGS) $<
+        
+%.o: %.f
+	f77 -c $<
+
+
+# default rule(s)
+all: $(MAINFILE)
+$(MAINFILE): $(OBJS)
+	$(LINK.c) $(LFLAGS) -o exec $^ $(LIBRARIES)
+
+# overridden implict rules (i.e. extra dependencies)
+main.o: main.cc main.h qobjects.h Makefile
+qobjects.o: qobjects.cc qobjects.h Makefile
+calc_objective.o: main.cc main.h qobjects.h Makefile
+lapack_interface.o: lapack_interface.h Makefile
+
+        
+depend:
+	mkdep -f depend $(OFLAGS) $(MAINFILE:%=%.cc) $(OTHERS:%=%.cc)
+.PHONY: depend
+include depend
+
