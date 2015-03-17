@@ -1,3 +1,4 @@
+
 #include "main.h"
 #include "qobjects.h"
 #include <cstdlib>
@@ -12,8 +13,6 @@
 #include <vector>
 #include <cmath>
 using namespace std;
-#include "mpi.h"
-
 
 
 
@@ -29,14 +28,6 @@ int	calls = 0;
 // --------------------------------------------
 
 int main(int argc, char* argv[]){ 
-	
-	//--------------------------------initialize MPI
-	int my_rank, nproc; 
-	MPI_Status status;
-	MPI_Init(&argc,&argv);
-	MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
-	MPI_Comm_size(MPI_COMM_WORLD,&nproc);
-	
 	
 	const double pi = 3.14159; 
 	
@@ -66,7 +57,7 @@ int main(int argc, char* argv[]){
 	my_func.fdf = my_fdf;
 	my_func.params = par;
 	
-	double linemin_tol = 0.001; 
+	double linemin_tol = 0.01; 
 	double step_size = 0.1; 
 	double grad_bound = 1e-4; 
 		
@@ -75,7 +66,7 @@ int main(int argc, char* argv[]){
 	// initial point 
 	gsl_vector *x;
 	x = gsl_vector_alloc(static_cast<size_t>(Nspace));
-	for (int i=0;i<Nspace;i++) { gsl_vector_set(x, i, 0 ); }
+	for (int i=0;i<Nspace;i++) { gsl_vector_set(x, i, 0.5); }
 	
 	// initialize optimizer 
 	const gsl_multimin_fdfminimizer_type *T;
@@ -141,9 +132,6 @@ int main(int argc, char* argv[]){
 	optlogfl.close();
 	optdatfl.close();
 //	MPI_Finalize();
-	
-	MPI_Finalize();
-
 					 
 	return 0;
 }
